@@ -37,8 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo json_encode(['response' => trim($output)]);
     exit;
 }
-?>
-<!DOCTYPE html>
+?><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -172,32 +171,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script>
         const drones = [];
+        const chatContainer = document.querySelector('.chat-container');
+        let droneBehindChat = null;
 
-        function createDrone() {
-            const drone = document.createElement('div');
-            drone.classList.add('drone');
-
-            // Set random starting position
-            const startX = Math.random() * (window.innerWidth - 100); // Adjust for drone width
-            const startY = Math.random() * (window.innerHeight - 100); // Adjust for drone height
-
+        function setupDrone(drone, startX, startY, endX, endY, duration) {
             drone.style.left = `${startX}px`;
             drone.style.top = `${startY}px`;
 
-            // Set random duration for flight (speed control)
-            const duration = Math.random() * 40 + 40; // Random duration between 40s and 80s
+            drone.style.setProperty('--start-x', `${startX}px`);
+            drone.style.setProperty('--start-y', `${startY}px`);
+            drone.style.setProperty('--end-x', `${endX}px`);
+            drone.style.setProperty('--end-y', `${endY}px`);
 
             drone.style.animation = `fly ${duration}s linear infinite`;
 
-            document.body.appendChild(drone);
-            drones.push(drone);
-
-            // Animate the drone with random end position
-            const endX = Math.random() * (window.innerWidth - 100);
-            const endY = Math.random() * (window.innerHeight - 100);
-
-            drone.animate([
-                { transform: `translate(0, 0)` },
+            const animation = drone.animate([
+                { transform: 'translate(0, 0)' },
                 { transform: `translate(${endX - startX}px, ${endY - startY}px)` }
             ], {
                 duration: duration * 1000,
@@ -205,18 +194,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 easing: 'linear'
             });
 
-            // Ensure the drone bounces off the edges
-            drone.addEventListener('animationiteration', () => {
-                const newStartX = Math.random() * (window.innerWidth - 100);
-                const newStartY = Math.random() * (window.innerHeight - 100);
-                drone.style.left = `${newStartX}px`;
-                drone.style.top = `${newStartY}px`;
-            });
+            monitorDrone(drone, animation, duration);
         }
 
-        // Create 3 drones initially
+        function monitorDrone(drone, animation, duration) {
+            setInterval(() => {
+                const droneRect = drone.getBoundingClientRect();
+                const chatRect = chatContainer.getBoundingClientRect();
+                const isBehindChat = (
+                    droneRect.left < chatRect.right &&
+                    droneRect.right > chatRect.left &&
+                    droneRect.top < chatRect.bottom &&
+                    droneRect.bottom > chatRect.top
+                );
+
+                if (isBehindChat) {
+                    if (droneBehindChat === null) {
+                        droneBehindChat = drone;
+                        animation.updatePlaybackRate(3); // Speed up by 3 times
+
+                        setTimeout(() => {
+                            if (droneBehindChat === drone) {
+                                moveDroneOutOfChat(drone, animation, duration);
+                            }
+                        }, 2000); // 2 seconds
+                    } else if (droneBehindChat !== drone) {
+                        moveDroneOutOfChat(drone, animation, duration);
+                    }
+                } else if (droneBehindChat === drone) {
+                    droneBehindChat = null;
+                    animation.updatePlaybackRate(1); // Normal speed
+                }
+            }, 100);
+        }
+
+        function moveDroneOutOfChat(drone, animation, duration) {
+            const newStartX = Math.random() * (window.innerWidth - 100);
+            const newStartY = Math.random() * (window.innerHeight - 100);
+            const newEndX = Math.random() * (window.innerWidth - 100);
+            const newEndY = Math.random() * (window.innerHeight - 100);
+
+            drone.style.left = `${newStartX}px`;
+            drone.style.top = `${newStartY}px`;
+
+            drone.style.setProperty('--start-x', `${newStartX}px`);
+            drone.style.setProperty('--start-y', `${newStartY}px`);
+            drone.style.setProperty('--end-x', `${newEndX}px`);
+            drone.style.setProperty('--end-y', `${newEndY}px`);
+
+            animation.cancel();
+            drone.style.animation = `fly ${duration}s linear infinite`;
+
+            setupDrone(drone, newStartX, newStartY, newEndX, newEndY, duration);
+            droneBehindChat = null;
+        }
+
+        // Initialize 3 drones
         for (let i = 0; i < 3; i++) {
-            createDrone();
+            const drone = document.createElement('div');
+            drone.classList.add('drone');
+            document.body.appendChild(drone);
+            drones.push(drone);
+
+            const startX = Math.random() * (window.innerWidth - 100);
+            const startY = Math.random() * (window.innerHeight - 100);
+            const endX = Math.random() * (window.innerWidth - 100);
+            const endY = Math.random() * (window.innerHeight - 100);
+            const duration = Math.random() * 4 + 22; // Random duration between 40s and 80s
+
+            setupDrone(drone, startX, startY, endX, endY, duration);
         }
 
         async function sendMessage() {
@@ -274,3 +320,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </script>
 </body>
 </html>
+
