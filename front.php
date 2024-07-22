@@ -157,7 +157,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <img src="logo.jpeg" alt="Skytrade Logo" />
         </div>
         <div class="chat-box" id="chat-box">
-            <!-- Messages will be appended here -->
         </div>
         <div class="input-box">
             <input type="text" id="user-input" placeholder="Type a message..." />
@@ -169,7 +168,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const drones = [];
         const chatContainer = document.querySelector('.chat-container');
 
-        // Initialize drones
         for (let i = 0; i < 3; i++) {
             const drone = document.createElement('div');
             drone.classList.add('drone');
@@ -215,7 +213,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             const chatBox = document.getElementById("chat-box");
 
-            // Display user message
             const userMessage = document.createElement("div");
             userMessage.classList.add("message", "user");
             userMessage.innerText = userInput;
@@ -224,7 +221,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             document.getElementById("user-input").value = "";
 
             try {
-                // Send user message to backend
                 const response = await fetch("", {
                     method: "POST",
                     headers: {
@@ -236,7 +232,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const result = await response.json();
 
                 if (response.ok) {
-                    // Display bot response
                     const botMessage = document.createElement("div");
                     botMessage.classList.add("message", "bot");
                     botMessage.innerText = result.response;
@@ -250,11 +245,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 alert('Error: ' + error.message);
             }
 
-            // Scroll to the bottom of the chat
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        // Add event listener for 'Enter' key press
         document.getElementById("user-input").addEventListener("keypress", function(event) {
             if (event.key === 'Enter') {
                 event.preventDefault();
