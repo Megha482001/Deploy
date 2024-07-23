@@ -1,7 +1,7 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Content-Type: application/json");
- 
+
     $input = json_decode(file_get_contents("php://input"), true);
 
     if (is_null($input)) {
@@ -18,9 +18,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $userMessage = $input['message'];
 
-    file_put_contents("user_message.txt", $userMessage);
+    $escapedMessage = escapeshellarg($userMessage);
 
-    $command = escapeshellcmd('python chatbot_model.py');
+    $command = escapeshellcmd("python main.py $escapedMessage");
     $output = shell_exec($command);
 
     if ($output === null) {
@@ -32,7 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo json_encode(['response' => trim($output)]);
     exit;
 }
-?> 
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -145,8 +146,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .message.bot {
-            background: #333;
-            color: #ffffff;
+            background: #ffffff;
+            color:#007bff;
             align-self: flex-start;
         }
     </style>
@@ -154,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <img src="logo.jpeg" alt="Skytrade Logo" />
+            <img src="logo.jpg" alt="Skytrade Logo" />
         </div>
         <div class="chat-box" id="chat-box">
         </div>
@@ -183,8 +184,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         function setupDrone(drone, x, y, dx, dy) {
-            drone.style.left = `${x}px`;
-            drone.style.top = `${y}px`;
+            drone.style.left = ${x}px;
+            drone.style.top = ${y}px;
 
             function moveDrone() {
                 x += dx;
@@ -198,8 +199,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     dy = -dy;
                 }
 
-                drone.style.left = `${x}px`;
-                drone.style.top = `${y}px`;
+                drone.style.left = ${x}px;
+                drone.style.top = ${y}px;
 
                 requestAnimationFrame(moveDrone);
             }
@@ -257,4 +258,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </script>
 </body>
 </html>
-
