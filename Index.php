@@ -184,8 +184,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         function setupDrone(drone, x, y, dx, dy) {
-            drone.style.left = ${x}px;
-            drone.style.top = ${y}px;
+            drone.style.left = $;{x}px;
+            drone.style.top = $;{y}px;
 
             function moveDrone() {
                 x += dx;
@@ -199,8 +199,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     dy = -dy;
                 }
 
-                drone.style.left = ${x}px;
-                drone.style.top = ${y}px;
+                drone.style.left = $;{x}px;
+                drone.style.top = $;{y}px;
 
                 requestAnimationFrame(moveDrone);
             }
